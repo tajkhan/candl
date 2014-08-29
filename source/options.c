@@ -39,6 +39,8 @@
 #include <string.h>
 #include <candl/macros.h>
 #include <candl/options.h>
+#include <osl/scop.h>
+#include <osl/extensions/candloptions.h>
 
 
 /******************************************************************************
@@ -54,6 +56,57 @@
  */
 void candl_options_print(FILE * foo, candl_options_p options) {
   fprintf(foo, "Options:\n");
+  if (options != NULL) {
+
+    // Print the options content.
+    fprintf(foo, "waw %d # write after write (output)"
+                    "dependences matter\n", options->waw);
+
+    fprintf(foo, "raw %d # read  after write (flow)"
+                    "dependences matter\n", options->raw);
+
+    fprintf(foo,"war %d # write after read  (anti)"
+                   "dependences matter\n", options->war);
+
+    fprintf(foo,"rar %d # read  after read  (input)"
+                   "dependences matter\n", options->rar);
+
+    fprintf(foo,"commute %d # use commutativity to simplify dependences\n",
+                   options->commute);
+
+    fprintf(foo,"fullcheck %d # compute all dependence violations\n",
+                   options->fullcheck);
+
+    fprintf(foo,"scalren %d # enable scalar renaming\n",
+                   options->scalar_renaming);
+
+    fprintf(foo,"scalpriv %d # enable scalar privatization\n",
+                   options->scalar_privatization);
+
+    fprintf(foo,"scalexp %d # enable scalar expansion\n",
+                  options->scalar_expansion);
+
+    fprintf(foo,"lastwriter %d # compute last writer\n",
+                   options->lastwriter);
+
+    fprintf(foo,"verbose %d # enable verbose output\n",
+                   options->verbose);
+
+    fprintf(foo,"outscop %d # print the scop with dependences\n",
+                   options->outscop);
+
+    fprintf(foo,"autocorrect %d # correct violations.\n",
+                   options->autocorrect);
+
+    fprintf(foo,"view %d # call dot and gv to visualize the graphs\n",
+                   options->view);
+
+    fprintf(foo,"struct %d # print internal dependence structure\n",
+                   options->structure);
+
+    fprintf(foo,"prune-dups %d # use experimental dependence"
+                   " pruning algorithm\n", options->prune_dups);
+  }
 }
 
 
@@ -407,3 +460,63 @@ void candl_options_read(int argc, char** argv, FILE** input, FILE** output,
     exit(0);
 }
 
+/**
+ * candl_options_read_from_scop( function:
+ * This function candl_options structure made from the
+ * the osl_candloptions extension in the scop passed to it.
+ *
+ * \param[in] options   Pointer to osl_scop
+ * \return              Pointer to newly candl_options structure, or NULL.
+ */
+candl_options_p candl_options_read_from_scop(osl_scop_p scop)
+{ osl_candloptions_p options;
+  candl_options_p candloptions ;
+
+  options = osl_generic_lookup(scop->extension, OSL_URI_CANDLOPTIONS);
+  if(options==NULL) {
+    fprintf(stderr, "[Candl]Warning: Unable to find osl_clandloptions\n");
+    return NULL;
+  }
+
+  /* Memory allocation for the CandlOptions structure. */
+  candloptions = candl_options_malloc();
+  if (candloptions == NULL) {
+    fprintf(stderr, "[Candl]ERROR: memory overflow.\n");
+    exit(1);
+  }
+
+  if (options->waw_set)
+    candloptions->waw                = options->waw;
+  if (options->raw_set)
+  candloptions->raw                  = options->raw;
+  if (options->war_set)
+  candloptions->war                  = options->war;
+  if (options->rar_set)
+  candloptions->rar                  = options->rar;
+  if (options->commute_set)
+  candloptions->commute              = options->commute;
+  if (options->fullcheck_set)
+  candloptions->fullcheck            = options->fullcheck;
+  if (options->scalar_renaming_set)
+  candloptions->scalar_renaming      = options->scalar_renaming;
+  if (options->scalar_privatization_set)
+  candloptions->scalar_privatization = options->scalar_privatization;
+  if (options->scalar_expansion_set)
+  candloptions->scalar_expansion     = options->scalar_expansion;
+  if (options->lastwriter_set)
+  candloptions->lastwriter           = options->lastwriter;
+  if (options->verbose_set)
+  candloptions->verbose              = options->verbose;
+  if (options->outscop_set)
+  candloptions->outscop              = options->outscop;
+  if (options->autocorrect_set)
+  candloptions->autocorrect          = options->autocorrect;
+  if (options->view_set)
+  candloptions->view                 = options->view;
+  if (options->structure_set)
+  candloptions->structure            = options->structure;
+  if (options->prune_dups_set)
+  candloptions->prune_dups           = options->prune_dups;
+
+  return candloptions ;
+}

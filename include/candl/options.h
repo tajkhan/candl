@@ -37,6 +37,7 @@
 # define CANDL_OPTIONS_H
 
 # include <stdio.h>
+# include "osl/scop.h"
 
 # if defined(__cplusplus)
 extern "C"
@@ -57,7 +58,7 @@ struct candl_options {
   int fullcheck; /**< 1 to compute all dependence violations. */
   int scalar_renaming; /**< 1 to enable scalar renaming. */
   int scalar_privatization; /**< 1 to enable scalar privatization. */
-  int scalar_expansion; /**< 1 to enable scalar privatization. */
+  int scalar_expansion; /**< 1 to enable scalar expansion. */
   int lastwriter; /**< 1 to compute last writer */
   int verbose; /**< 1 to enable verbose output. */
   int outscop; /**< 1 to print the scop with dependences. */
@@ -92,6 +93,7 @@ void candl_options_read(int, char **, FILE **, FILE **, FILE**, candl_options_p*
  *                            Processing functions                            *
  ******************************************************************************/
 candl_options_p candl_options_malloc(void);
+candl_options_p candl_options_read_from_scop(osl_scop_p);
 
 #if defined(__cplusplus)
   }
