@@ -1615,9 +1615,8 @@ int candl_dependence_scalar_renaming(osl_scop_p scop,
                              newvar + parts[j]);
               arrays = osl_generic_lookup(scop->extension, OSL_URI_ARRAYS); 
               rename_id = osl_arrays_get_index_from_id(arrays, scalars[i]);
-              strcpy(rename, arrays->names[rename_id]);
-              osl_arrays_add(arrays, newvar + parts[j],
-                  strcat(rename, "_renamed"));
+              sprintf(rename, "%s_renamed%d", arrays->names[rename_id],newvar+parts[j]);
+              osl_arrays_add(arrays, newvar + parts[j], rename);
             }
           }
         }
